@@ -216,7 +216,12 @@ static const int kDYYYButtonsPerRow = 10;
     
     // 添加触摸事件
     [button addTarget:self action:@selector(characterTouchDown:) forControlEvents:UIControlEventTouchDown];
-    [button addTarget:self action:@selector(characterTouchMoved:withEvent:) forControlEvents:UIControlEventTouchDragInside | UIControlEventTouchDragEnter | UIControlEventTouchDragExit];
+    [button addTarget:self
+                   action:@selector(characterTouchMoved:withEvent:)
+         forControlEvents:UIControlEventTouchDragInside |
+                          UIControlEventTouchDragEnter |
+                          UIControlEventTouchDragExit |
+                          UIControlEventTouchDragOutside];
     [button addTarget:self action:@selector(characterTouchUp:) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
     
     [self.charactersScrollView addSubview:button];
@@ -234,8 +239,9 @@ static const int kDYYYButtonsPerRow = 10;
 
 - (void)characterTouchMoved:(UIButton *)sender withEvent:(UIEvent *)event {
   if (self.isSelecting) {
-    UITouch *touch = [[event touchesForView:sender] anyObject];
+    UITouch *touch = [[event allTouches] anyObject];
     CGPoint currentPoint = [touch locationInView:self.charactersScrollView];
+    currentPoint.y += self.charactersScrollView.contentOffset.y;
 
     NSInteger col = floor(currentPoint.x / (kDYYYButtonSize + kDYYYButtonMargin));
     NSInteger row = floor(currentPoint.y / (kDYYYButtonSize + kDYYYButtonMargin));
